@@ -2,12 +2,14 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 )
 
 type Item struct {
-	ID       int
-	Category string
-	Price    int
+	ID        int
+	Category  string
+	Price     int
+	CreatedAt string
 }
 
 // 家計簿の処理を行う型
@@ -26,7 +28,8 @@ func (ab *AccountBook) CreateTable() error {
 	const sqlStr = `CREATE TABLE IF NOT EXISTS items(
 		id        INTEGER PRIMARY KEY,
 		category  TEXT NOT NULL,
-		price     INTEGER NOT NULL
+		price     INTEGER NOT NULL,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	);`
 
 	_, err := ab.db.Exec(sqlStr)
@@ -62,10 +65,11 @@ func (ab *AccountBook) GetItems(limit int) ([]*Item, error) {
 	var items []*Item
 	for rows.Next() {
 		var item Item
-		err := rows.Scan(&item.ID, &item.Category, &item.Price)
+		err := rows.Scan(&item.ID, &item.Category, &item.Price, &item.CreatedAt)
 		if err != nil {
 			return nil, err
 		}
+		fmt.Println(item)
 		items = append(items, &item)
 	}
 
